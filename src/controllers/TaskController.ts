@@ -12,7 +12,6 @@ export class TaskController {
             const { title, description } = req.body as ICreateTask;
 
             if (!title) throw new Error("Campo 'title' ausente no corpo da requisição");
-            if (!description) throw new Error("Campo 'description' ausente no corpo da requisição");
 
             const taskService = new TaskService();
             const task = taskService.create({ title, description });
@@ -23,10 +22,35 @@ export class TaskController {
         }
     }
 
-    list(req: Request, res: Response) {
-        const taskService = new TaskService();
-        const tasks = taskService.list();
+    getById(req: Request, res: Response) {
+        try {
+            if (!req.params) throw new Error("Parâmetros ausentes na requisição");
 
-        return res.status(200).json(tasks);
+            const idParam = req.params.id;
+            const id = Number(idParam);
+
+            if (!idParam) throw new Error("Campo 'id' ausente no corpo da requisição");
+            if (isNaN(id)) throw new Error("Campo 'id' inválido");
+
+            const taskService = new TaskService();
+            const task = taskService.getById(id);
+
+            if (!task) return res.status(404).json({ error: "Não foi encontrado uma tarefa com esse 'id'" });
+
+            return res.status(200).json(task);
+        } catch (error: any) {
+            return res.status(400).json({ error: error.message });
+        }
+    }
+
+    list(req: Request, res: Response) {
+        try {
+            const taskService = new TaskService();
+            const tasks = taskService.list();
+
+            return res.status(200).json(tasks);
+        } catch (error: any) {
+            return res.status(400).json({ error: error.message });
+        }
     }
 }

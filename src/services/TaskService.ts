@@ -16,6 +16,16 @@ export class TaskService {
         return task;
     }
 
+    getById(id: Task["id"]) {
+        if (!id || isNaN(id) || !isFinite(id)) throw new Error("'id' inválido");
+
+        const task = tasks.find((t) => t.id === id);
+
+        if (!task) return null;
+
+        return task;
+    }
+
     list() {
         // Retornando uma cópia de tasks ao invés da referência, para evitar modificações indevidas
         return [...tasks];
