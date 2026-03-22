@@ -3,6 +3,7 @@ import { Task } from "../models/Task";
 const tasks: Task[] = [];
 
 type ICreateTask = Omit<Task, "id" | "createdAt" | "completed">;
+type IEditTask = Omit<Task, "id" | "createdAt">;
 
 export class TaskService {
     create({ title, description }: ICreateTask) {
@@ -24,6 +25,16 @@ export class TaskService {
         if (!task) return null;
 
         return task;
+    }
+
+    edit(id: Task["id"], editedTask: IEditTask) {
+        const taskIndex = tasks.findIndex((t) => t.id === id);
+
+        if (taskIndex === -1) throw new Error("Não existe uma tarefa com esse 'id'");
+
+        tasks[taskIndex]! = { ...tasks[taskIndex]!, ...editedTask };
+
+        return tasks[taskIndex];
     }
 
     list() {
