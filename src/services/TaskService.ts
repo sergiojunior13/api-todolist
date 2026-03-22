@@ -4,6 +4,12 @@ let tasks: Task[] = [];
 
 type ICreateTask = Omit<Task, "id" | "createdAt" | "completed">;
 type IEditTask = Omit<Task, "id" | "createdAt">;
+type IListFilter = {
+    completed?: Task["completed"];
+    title?: Task["title"];
+    description?: Task["description"];
+    createdAt?: Task["createdAt"];
+};
 
 export class TaskService {
     create({ title, description }: ICreateTask) {
@@ -37,9 +43,21 @@ export class TaskService {
         return tasks[taskIndex];
     }
 
-    list() {
+    list(filters?: IListFilter) {
         // Retornando uma cópia de tasks ao invés da referência, para evitar modificações indevidas
-        return [...tasks];
+        if (!filters) return [...tasks];
+
+        const filtersEntries = Object.entries(filters);
+
+        const filteredTasks = tasks.filter((task) =>
+            // Filtra as tarefas em que todos os campos da tarefa sejam IGUAIS aos campos dos filtros
+            /* É necessário converte o task[field] para String para que a comparação funcione,
+            já que os filtros são do tipo String. Por exemplo, para resolver isso: true == "true" (Dá false)
+            */
+            filtersEntries.every(([field, value]) => String(task[field as keyof Task]) === value),
+        );
+
+        return filteredTasks;
     }
 
     delete(id: Task["id"]) {

@@ -74,8 +74,19 @@ export class TaskController {
 
     list(req: Request, res: Response) {
         try {
+            const filters = req.query;
+
+            if (
+                Object.keys(filters).length > 0 && // Se tem algum filtro
+                !filters.completed &&
+                !filters.title &&
+                !filters.description &&
+                !filters.createdAt
+            )
+                throw new Error("Insira somente filtros válidos");
+
             const taskService = new TaskService();
-            const tasks = taskService.list();
+            const tasks = taskService.list(filters);
 
             return res.status(200).json(tasks);
         } catch (error: any) {
