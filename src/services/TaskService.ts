@@ -50,9 +50,10 @@ export class TaskService {
         const filtersEntries = Object.entries(filters);
 
         const filteredTasks = tasks.filter((task) =>
-            // Filtra as tarefas em que todos os campos da tarefa sejam IGUAIS aos campos dos filtros
+            // Filtra as tarefas em que os respectivos campos da tarefa sejam IGUAIS aos campos dos filtros
+
             /* É necessário converte o task[field] para String para que a comparação funcione,
-            já que os filtros são do tipo String. Por exemplo, para resolver isso: true == "true" (Dá false)
+            já que os filtros são do tipo String. Por exemplo, para resolver isso: true == "true" (retorna false)
             */
             filtersEntries.every(([field, value]) => String(task[field as keyof Task]) === value),
         );
