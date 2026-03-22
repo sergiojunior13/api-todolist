@@ -82,4 +82,23 @@ export class TaskController {
             return res.status(400).json({ error: error.message });
         }
     }
+
+    delete(req: Request, res: Response) {
+        try {
+            if (!req.params) throw new Error("Parâmetros ausentes na requisição");
+
+            const idParam = req.params.id;
+            const id = Number(idParam);
+
+            if (!idParam) throw new Error("Campo 'id' ausente no corpo da requisição");
+            if (isNaN(id)) throw new Error("Campo 'id' inválido");
+
+            const taskService = new TaskService();
+            taskService.delete(id);
+
+            return res.status(204).send();
+        } catch (error: any) {
+            return res.status(400).json({ error: error.message });
+        }
+    }
 }

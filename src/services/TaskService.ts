@@ -1,6 +1,6 @@
 import { Task } from "../models/Task";
 
-const tasks: Task[] = [];
+let tasks: Task[] = [];
 
 type ICreateTask = Omit<Task, "id" | "createdAt" | "completed">;
 type IEditTask = Omit<Task, "id" | "createdAt">;
@@ -40,5 +40,14 @@ export class TaskService {
     list() {
         // Retornando uma cópia de tasks ao invés da referência, para evitar modificações indevidas
         return [...tasks];
+    }
+
+    delete(id: Task["id"]) {
+        const prevTasksLength = tasks.length;
+
+        tasks = tasks.filter((t) => t.id !== id);
+
+        // Isso significa que nenhum elemento foi efetivamente removido, ou seja, que não existia uma task com esse id
+        if (tasks.length === prevTasksLength) throw new Error("Não existe nenhuma tarefa com esse 'id'");
     }
 }
