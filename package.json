@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules src/index.ts"
-},
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sergiojunior13/api-todolist.git"
@@ -13,18 +13,22 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/sergiojunior13/api-todolist/issues"
   },
   "homepage": "https://github.com/sergiojunior13/api-todolist#readme",
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
-    "ts-node-dev": "^2.0.0",
+    "prisma": "^7.5.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

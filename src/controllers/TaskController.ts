@@ -6,7 +6,7 @@ type ICreateTask = Omit<Task, "id" | "createdAt" | "completed">;
 type IEditTask = Omit<Task, "id" | "createdAt">;
 
 export class TaskController {
-    create(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
         try {
             if (!req.body) throw new Error("Corpo da requisição ausente");
 
@@ -15,15 +15,14 @@ export class TaskController {
             if (!title) throw new Error("Campo 'title' ausente no corpo da requisição");
 
             const taskService = new TaskService();
-            const task = taskService.create({ title, description });
-
+            const task = await taskService.create({ title, description });
             return res.status(201).json(task);
         } catch (error: any) {
             return res.status(400).json({ error: error.message });
         }
     }
 
-    getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response) {
         try {
             if (!req.params) throw new Error("Parâmetros ausentes na requisição");
 
@@ -34,7 +33,7 @@ export class TaskController {
             if (isNaN(id)) throw new Error("Campo 'id' inválido");
 
             const taskService = new TaskService();
-            const task = taskService.getById(id);
+            const task = await taskService.getById(id);
 
             if (!task) return res.status(404).json({ error: "Não foi encontrado uma tarefa com esse 'id'" });
 
@@ -44,7 +43,7 @@ export class TaskController {
         }
     }
 
-    edit(req: Request, res: Response) {
+    async edit(req: Request, res: Response) {
         try {
             if (!req.params) throw new Error("Parâmetros ausentes na requisição");
 
@@ -58,21 +57,21 @@ export class TaskController {
 
             const body = req.body as IEditTask;
 
-            if (!body.title && !body.description && !body.completed)
+            if (!body.title && !body.description && body.completed === undefined)
                 throw new Error(
                     "Ao menos um dos seguintes campos devem estar presente no corpo da requisição: title, description, completed",
                 );
 
             const taskService = new TaskService();
-            const task = taskService.edit(id, body);
+            const task = await taskService.edit(id, body);
 
             return res.status(200).json(task);
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return res.status(error?.cause?.code ? Number(error.cause.code) : 400).json({ error: error.message });
         }
     }
 
-    list(req: Request, res: Response) {
+    async getAll(req: Request, res: Response) {
         try {
             const filters = req.query;
 
@@ -85,8 +84,12 @@ export class TaskController {
             )
                 throw new Error("Insira somente filtros válidos");
 
+            // É necessário usar filters.completed === "true" para 'converter' de string para boolean
+            const completed: boolean | undefined =
+                filters.completed !== undefined ? filters.completed === "true" : undefined;
+
             const taskService = new TaskService();
-            const tasks = taskService.list(filters);
+            const tasks = await taskService.getAll({ ...filters, completed });
 
             return res.status(200).json(tasks);
         } catch (error: any) {
@@ -94,7 +97,7 @@ export class TaskController {
         }
     }
 
-    delete(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
             if (!req.params) throw new Error("Parâmetros ausentes na requisição");
 
@@ -105,11 +108,11 @@ export class TaskController {
             if (isNaN(id)) throw new Error("Campo 'id' inválido");
 
             const taskService = new TaskService();
-            taskService.delete(id);
+            await taskService.delete(id);
 
             return res.status(204).send();
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return res.status(error?.cause?.code ? Number(error.cause.code) : 400).json({ error: error.message });
         }
     }
 }
