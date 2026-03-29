@@ -1,13 +1,13 @@
 export class Task {
     id: number;
     title: string;
-    description: string | undefined;
+    description: string | null;
     completed: boolean;
     createdAt: Date;
 
-    constructor(title: string, description?: string) {
+    constructor(title: string, description?: string | null) {
         this.title = title;
-        this.description = description;
+        this.description = description || null;
 
         this.completed = false;
         this.createdAt = new Date();
